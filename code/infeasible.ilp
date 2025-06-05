@@ -1,0 +1,10 @@
+\ Model mip_path_allocation_copy
+\ LP format - for model browsing. Use MPS format to capture full model detail.
+Minimize
+ 
+Subject To
+ R369: zkp_sum[244] = 0
+ R869: zkp_sum[244] = 1
+Bounds
+ zkp_sum[244] free
+End
