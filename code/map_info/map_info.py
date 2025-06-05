@@ -93,24 +93,8 @@ class MapInfo:
         self.area_dict = None
         self.area_capacity = None
 
-    # --- Initialization Methods ---
-    # def init_main_pic(self):
-    #     """Initialize map decomposition and network construction from an image."""
-    #     logging.info("Map decomposition and network construction started!")
-    #     self.read_map_pic()
-    #     self.extract_info()
-    #     self.construct_cell_structure()
-    #     self.deal_with_resolution()
-    #
-    #     self.cell_net_construct()
-    #     self.adj_net_construct()
-    #
-    #     # self.draw_separate_cell()
-    #     # self.draw_network_cell()
-    #     # self.draw_network_adj()
-    #
-    #     self.construct_dijkstra()
-    #     self.update_para()
+        self.global_binary_map = None
+        self.local_binary_map = None
 
     def init_main_yaml(self):
         """Initialize map decomposition and network construction from a YAML file."""
@@ -126,9 +110,7 @@ class MapInfo:
         # self.cell_net_construct()
         self.adj_net_construct()
         # self.cellId_info_build()
-
         # self.draw_separate_cell(self.area_map, len(self.area_dict))
-
         self.edge_info_build()
 
         # self.draw_separate_cell(self.bcd_out_im, self.bcd_out_cells)
@@ -140,43 +122,46 @@ class MapInfo:
         self.construct_dijkstra()
         self.update_para()
 
-    # --- Map Reading Methods ---
-    def read_map_pic(self):
-        """Read and process a map from an image file."""
-        original_map = cv2.imread(self.pic_name)
-        if original_map is None:
-            raise ValueError(f"Could not load image: {self.pic_name}")
-
-        # Convert to binary map (1 = free space, 0 = obstacle)
-        if len(original_map.shape) > 2:
-            single_channel_map = original_map[:, :, 0]
-            _, binary_map = cv2.threshold(single_channel_map, 127, 1, cv2.THRESH_BINARY)
-        else:
-            binary_map = original_map
-
-        # Perform Boustrophedon Cellular Decomposition
-        bcd_out_im, bcd_out_cells, _, _, _ = bcd(binary_map)
-        self._process_bcd_output(bcd_out_im, bcd_out_cells)
-
     def read_map_yaml(self):
         """Read and process a map from a YAML file."""
+
+        # 这里是通过读取yaml文件得到开始list 和 goal list
+        # 以及dimensions 以及obstacles
+        # 前三个数据是稳定的 但是obs是变化的
+        # 这里可以写一个根据无人机当前的位置 更新obs的函数 通过这个函数去得到
         start_list, goal_list, dimensions, obstacles = self.input_map_yaml_file()
-        binary_map = np.ones((dimensions[0] + 1, dimensions[1] + 1), dtype=int)
+        self.global_binary_map = np.ones((dimensions[0] + 1, dimensions[1] + 1), dtype=int)
 
         self.x_size = dimensions[0]
         self.y_size = dimensions[1]
         # Set boundaries as obstacles
-        binary_map[0, :] = 0
-        binary_map[-1, :] = 0
-        binary_map[:, 0] = 0
-        binary_map[:, -1] = 0
+        self.global_binary_map[0, :] = 0
+        self.global_binary_map[-1, :] = 0
+        self.global_binary_map[:, 0] = 0
+        self.global_binary_map[:, -1] = 0
 
         # Place obstacles
         for obs in obstacles:
-            binary_map[obs[0], obs[1]] = 0
+            self.global_binary_map[obs[0], obs[1]] = 0
+        # self.update_map(dimensions, obstacles)
 
+    def local_obs_perception(self, obstacles):
+        # 根据当下无人机的位置 以及 观测的范围
+        # 去根据这些去更新obs
+        # 得到obs和map后 进一步去
+
+        # obs如果被观测到了 那么就一直存在
+        # obs如果没有被观测到 那么就不存在
+
+        # self.swarm.pos_all 存储着所有无人机的位置
+        # self.global_binary_map 是全局的地图
+        # 输出是 self.local_binary_map
+        pass
+
+
+    def update_map(self,  ):
         # Perform Boustrophedon Cellular Decomposition
-        bcd_out_im, bcd_out_cells, _, _, _ = bcd(binary_map)
+        bcd_out_im, bcd_out_cells, _, _, _ = bcd(self.local_binary_map)
         self._process_bcd_output(bcd_out_im, bcd_out_cells)
 
 

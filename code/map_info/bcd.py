@@ -97,7 +97,6 @@ def bcd(erode_img: np.ndarray) -> Tuple[np.ndarray, int]:
         non_neighboor_cells --> contains cell index numbers of non_neighboor_cells, i.e.
         cells which are separated by the objects
     """
-    
     assert len(erode_img.shape) == 2, 'Map should be single channel.'
     last_connectivity = 0
     last_connectivity_parts = []

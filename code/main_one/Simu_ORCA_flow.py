@@ -29,7 +29,7 @@ class Simu_ORCA_flow:
         # self.pic_name = "pic/map_yaml/m1-10-corridor.yaml"
         # self.pic_name = "pic/map_yaml/m1-500-maze-3.yaml"
         # self.pic_name = "pic/map_yaml/m1-500-forest-n.yaml"
-        self.pic_name = "pic/map_yaml/m1-500-hard.yaml"
+        self.pic_name = "../pic/map_yaml/m1-500-hard.yaml"
 
         self.file_main = "result/test_flow_" + str_now
 
@@ -82,13 +82,17 @@ class Simu_ORCA_flow:
         self.simulator.setAgentDefaults(3.0, 20, 5.0, 5.0, 0.4, 5.0)
         # self.simulator.setAgentDefaults(30.0, 20, 20.0, 20.0, 0.4, 5.0)
 
-
     def init_simulation_area_planner(self, L_predictive, K_horizon):
         # self.title_name = 'data/' + self.add_name + '/para_2'
         self.swarm.init_swarm()
         self.swarm.compute_ave_start_goal_pos()
         self.mapInfo = map_info.MapInfo(self.swarm, self.pic_name, self.resolution)
+
+        t1 = time.time()
         self.mapInfo.init_main_yaml()
+        t2 = time.time()
+
+        print("mapInfo_time=" + str(t2 - t1) + "s")
         # self.pic_name = 'pic/new/maze2.png'
         # self.pic_name = 'pic/new/c1.png'
         # self.pic_name = 'pic/new/c2.png'
@@ -151,7 +155,6 @@ class Simu_ORCA_flow:
         # self.mapInfo.draw_mapInfo()
 
         t_r_flow = self.flow_planner_run()
-
         # self.planner_time += t4 - t3
         # self.planner_run_num += 1
         # self.t_r_flow_list.append(t_r_flow)
@@ -188,7 +191,6 @@ class Simu_ORCA_flow:
         print("flow main=" + str(tp3 - tp1))
         self.flow_main_time.append(tp3 - tp1)
         # logging.info("Path node selection =" + str(tp3 - tp2) + "s")
-
 
     def flow_planner_run(self):
         tp1 = time.time()
@@ -314,7 +316,6 @@ class Simu_ORCA_flow:
         # self.max_density_list.append(max_density)
         # self.mean_density_list.append(mean_density)
         # self.non_zero_mean_density.append(non_zero_mean_density)
-
 
     def set_preferred_velocities(self):
         # 为每个代理设置首选速度
